@@ -158,15 +158,16 @@ class FavDetailsFragment : Fragment() {
     }
 
     private fun loadWeatherIcon(imageView: android.widget.ImageView, iconCode: String) {
-        val iconUrl = "https://openweathermap.org/img/wn/$iconCode@4x.png"
+        val iconUrl = "ic_$iconCode"
+        val icon=context?.resources?.getIdentifier(iconUrl,"drawable",context?.packageName)
         Glide.with(imageView.context)
-            .load(iconUrl)
+            .load(icon)
             .placeholder(R.drawable.ic_weather_placeholder)
             .error(R.drawable.ic_weather_error)
             .diskCacheStrategy(DiskCacheStrategy.ALL)
             .format(DecodeFormat.PREFER_ARGB_8888)
             .into(imageView)
-        Log.d("FavDetailsFragment", "Loading icon: $iconUrl")
+        Log.d("loadWeatherIcon", "Loading icon: $iconUrl")
     }
 
     override fun onDestroyView() {

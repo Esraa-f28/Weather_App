@@ -1,18 +1,22 @@
 package com.example.myapplication.ui.settings.view
 
 import android.app.Activity
-import android.content.Context.MODE_PRIVATE
+import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.edit
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
+import androidx.navigation.findNavController
+import com.example.myapplication.MainActivity
 import com.example.myapplication.R
 import com.example.myapplication.databinding.FragmentSettingsBinding
 import com.example.myapplication.utils.OsmMapActivity
+import java.util.*
 
 class SettingsFragment : Fragment() {
 
@@ -22,6 +26,7 @@ class SettingsFragment : Fragment() {
         private const val PREF_TEMP_UNIT = "temp_unit"
         private const val PREF_WIND_UNIT = "wind_unit"
         private const val PREF_LANGUAGE = "language"
+        private const val PREF_USER_SET_LANGUAGE = "user_set_language"
         private const val PREF_NOTIFICATIONS = "notifications_enabled"
         private const val PREF_LATITUDE = "pref_latitude"
         private const val PREF_LONGITUDE = "pref_longitude"
@@ -41,11 +46,44 @@ class SettingsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        // Initialize SharedPreferences
+        sharedPreferences = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        // Load and apply saved language
+        val language = sharedPreferences.getString(PREF_LANGUAGE, getDeviceLanguage()) ?: getDeviceLanguage()
+        setLocale(language)
+
         _binding = FragmentSettingsBinding.inflate(inflater, container, false)
-        sharedPreferences = requireContext().getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
         loadSettings()
         setupListeners()
         return binding.root
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        // Reload settings to update radio buttons after language change
+        val language = sharedPreferences.getString(PREF_LANGUAGE, getDeviceLanguage()) ?: getDeviceLanguage()
+        setLocale(language)
+        loadSettings()
+        Log.d(TAG, "Configuration changed, updated language: $language")
+    }
+
+    private fun getDeviceLanguage(): String {
+        val deviceLocale = Locale.getDefault().language
+        return when (deviceLocale) {
+            "ar" -> "arabic"
+            else -> "english"
+        }
+    }
+
+    private fun setLocale(language: String) {
+        val locale = when (language) {
+            "arabic" -> Locale("ar")
+            else -> Locale("en")
+        }
+        Locale.setDefault(locale)
+        val config = resources.configuration
+        config.setLocale(locale)
+        requireContext().resources.updateConfiguration(config, resources.displayMetrics)
     }
 
     private fun loadSettings() {
@@ -69,11 +107,13 @@ class SettingsFragment : Fragment() {
             "mph" -> binding.rbMilesHour.isChecked = true
         }
 
-        val language = sharedPreferences.getString(PREF_LANGUAGE, "english") ?: "english"
+        val language = sharedPreferences.getString(PREF_LANGUAGE, getDeviceLanguage()) ?: getDeviceLanguage()
+        binding.languageRadioGroup.clearCheck() // Clear previous selection
         when (language) {
             "arabic" -> binding.rbArabic.isChecked = true
             "english" -> binding.rbEnglish.isChecked = true
         }
+        Log.d(TAG, "Loaded language: $language")
 
         val notificationsEnabled = sharedPreferences.getBoolean(PREF_NOTIFICATIONS, true)
         if (notificationsEnabled) {
@@ -121,11 +161,11 @@ class SettingsFragment : Fragment() {
                 intent.putExtra("source", "settings")
                 startActivityForResult(intent, REQUEST_CODE_MAP)
             } else {
-                sharedPreferences.edit()
-                    .putString(PREF_LOCATION_TYPE, "gps")
-                    .remove(PREF_LATITUDE)
-                    .remove(PREF_LONGITUDE)
-                    .apply()
+                sharedPreferences.edit {
+                    putString(PREF_LOCATION_TYPE, "gps")
+                    remove(PREF_LATITUDE)
+                    remove(PREF_LONGITUDE)
+                }
                 Log.d(TAG, "Saved location type: gps, cleared map coordinates")
             }
         }
@@ -135,20 +175,31 @@ class SettingsFragment : Fragment() {
             val language = when (checkedId) {
                 binding.rbArabic.id -> "arabic"
                 binding.rbEnglish.id -> "english"
-                else -> "english"
+                else -> getDeviceLanguage()
             }
-            sharedPreferences.edit()
-                .putString(PREF_LANGUAGE, language)
-                .apply()
-            Log.d(TAG, "Saved language: $language")
+
+            sharedPreferences.edit {
+                putString(PREF_LANGUAGE, language)
+                putBoolean(PREF_USER_SET_LANGUAGE, true)
+            }
+            Log.d(TAG, "User saved language: $language")
+
+            // Restart and navigate to home
+            (requireActivity() as MainActivity).apply {
+                // Clear any pending navigation actions
+                findNavController(R.id.nav_host_fragment_content_main).currentDestination?.let {
+                    findNavController(R.id.nav_host_fragment_content_main).popBackStack(it.id, true)
+                }
+                restartActivity(R.id.nav_home)
+            }
         }
 
         // Notifications listener
         binding.notificationRadioGroup.setOnCheckedChangeListener { _, checkedId ->
             val notificationsEnabled = checkedId == binding.rbEnableNotifications.id
-            sharedPreferences.edit()
-                .putBoolean(PREF_NOTIFICATIONS, notificationsEnabled)
-                .apply()
+            sharedPreferences.edit {
+                putBoolean(PREF_NOTIFICATIONS, notificationsEnabled)
+            }
             Log.d(TAG, "Saved notifications enabled: $notificationsEnabled")
         }
     }
@@ -169,24 +220,21 @@ class SettingsFragment : Fragment() {
             else -> sharedPreferences.getString(PREF_WIND_UNIT, "m/s") ?: "m/s"
         }
 
-        // Update UI for wind unit
         when (finalWindUnit) {
             "m/s" -> binding.rbMeterSec.isChecked = true
             "mph" -> binding.rbMilesHour.isChecked = true
         }
 
-        // Update UI for temp unit
         when (finalTempUnit) {
             "kelvin" -> binding.rbKelvin.isChecked = true
             "celsius" -> binding.rbCelsius.isChecked = true
             "fahrenheit" -> binding.rbFahrenheit.isChecked = true
         }
 
-        sharedPreferences.edit()
-            .putString(PREF_TEMP_UNIT, finalTempUnit)
-            .putString(PREF_WIND_UNIT, finalWindUnit)
-            .apply()
-
+        sharedPreferences.edit {
+            putString(PREF_TEMP_UNIT, finalTempUnit)
+            putString(PREF_WIND_UNIT, finalWindUnit)
+        }
         Log.d(TAG, "Saved temp unit: $finalTempUnit, wind unit: $finalWindUnit")
 
         isUpdatingWindUnit = false
@@ -199,32 +247,32 @@ class SettingsFragment : Fragment() {
             val lat = data?.getDoubleExtra("lat", 0.0) ?: 0.0
             val lon = data?.getDoubleExtra("lon", 0.0) ?: 0.0
             if (lat != 0.0 && lon != 0.0) {
-                sharedPreferences.edit()
-                    .putFloat(PREF_LATITUDE, lat.toFloat())
-                    .putFloat(PREF_LONGITUDE, lon.toFloat())
-                    .putString(PREF_LOCATION_TYPE, "map")
-                    .apply()
+                sharedPreferences.edit {
+                    putFloat(PREF_LATITUDE, lat.toFloat())
+                    putFloat(PREF_LONGITUDE, lon.toFloat())
+                    putString(PREF_LOCATION_TYPE, "map")
+                }
                 Log.d(TAG, "Saved map coordinates: lat=$lat, lon=$lon, location type: map")
             } else {
                 Log.w(TAG, "Invalid coordinates received from OsmMapActivity")
                 binding.rbGpsLocation.isChecked = true
                 selectedLocationType = "gps"
-                sharedPreferences.edit()
-                    .putString(PREF_LOCATION_TYPE, "gps")
-                    .remove(PREF_LATITUDE)
-                    .remove(PREF_LONGITUDE)
-                    .apply()
+                sharedPreferences.edit {
+                    putString(PREF_LOCATION_TYPE, "gps")
+                    remove(PREF_LATITUDE)
+                    remove(PREF_LONGITUDE)
+                }
                 Log.d(TAG, "Reverted to GPS, cleared map coordinates")
             }
         } else {
             Log.w(TAG, "OsmMapActivity cancelled or failed")
             binding.rbGpsLocation.isChecked = true
             selectedLocationType = "gps"
-            sharedPreferences.edit()
-                .putString(PREF_LOCATION_TYPE, "gps")
-                .remove(PREF_LATITUDE)
-                .remove(PREF_LONGITUDE)
-                .apply()
+            sharedPreferences.edit {
+                putString(PREF_LOCATION_TYPE, "gps")
+                remove(PREF_LATITUDE)
+                remove(PREF_LONGITUDE)
+            }
             Log.d(TAG, "Reverted to GPS, cleared map coordinates")
         }
     }

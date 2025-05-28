@@ -1,87 +1,93 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card="http://schemas.android.com/apk/res-auto"
-    android:layout_width="350dp"
-    android:layout_height="80dp"
-    android:layout_margin="8dp"
-    card:cardCornerRadius="50dp"
-    card:cardElevation="6dp"
-    >
+    android:layout_width="match_parent"
+    android:layout_height="100dp"
+    android:layout_margin="12dp"
+    card:cardElevation="0dp"
+    card:cardCornerRadius="12dp"
+    card:cardBackgroundColor="@android:color/transparent">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:padding="12dp"
-        android:background="@color/cardbackground">
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        android:background="@android:color/transparent">
 
         <!-- Day Name -->
         <TextView
             android:id="@+id/dayTextView"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="Tomorrow"
             android:textSize="16sp"
             android:textColor="#FFFFFF"
-            android:layout_marginEnd="16dp" />
+            android:textStyle="bold" />
 
         <!-- Weather Icon + Description -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="2"
             android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp">
 
             <ImageView
                 android:id="@+id/weatherIcon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_launcher_background"
-                android:contentDescription="Weather Icon"
-                android:layout_marginEnd="6dp"
-                 />
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginEnd="8dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_01d" />
 
             <TextView
                 android:id="@+id/weatherDescriptionTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Clear sky"
-                android:textSize="14sp"
+                android:text="Clear"
+                android:textSize="18sp"
                 android:textColor="#FFFFFF" />
         </LinearLayout>
 
         <!-- Min and Max Temperature -->
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="end">
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="end"
+            android:layout_marginStart="8dp">
 
             <TextView
                 android:id="@+id/tempMaxTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="23°C"
-                android:textSize="14sp"
-                android:textColor="#FFFFFF" />
+                android:textSize="16sp"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/comma"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=" / "
-                android:textSize="14sp"
-                android:textColor="#FFFFFF" />
+                android:layout_height="0dp"
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/tempMinTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="13°C"
-                android:textSize="14sp"
-                android:textColor="#FFFFFF" />
+                android:textSize="16sp"
+                android:textColor="#B0BEC5" />
         </LinearLayout>
 
     </LinearLayout>

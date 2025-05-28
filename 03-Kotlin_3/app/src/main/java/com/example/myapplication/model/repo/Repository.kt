@@ -2,22 +2,24 @@ package com.example.myapplication.model.repo
 
 import com.example.myapplication.model.local.Alert
 import com.example.myapplication.model.local.FavoritePlace
+import com.example.myapplication.model.local.ILocalDataSource
 import com.example.myapplication.model.local.LocalDataSource
+import com.example.myapplication.model.remote.IRemoteDataSource
 import com.example.myapplication.model.remote.RemoteDataSource
 import com.example.weatherapp.model.pojos.CurrentWeatherResponse
 import com.example.weatherapp.model.pojos.WeatherResponse
 
 class Repository(
-    private val remoteDataSource: RemoteDataSource,
-    private val localDataSource: LocalDataSource
+    private val remoteDataSource: IRemoteDataSource,
+    private val localDataSource: ILocalDataSource
 ) {
     companion object {
         @Volatile
         private var instance: Repository? = null
 
         fun getInstance(
-            remoteDataSource: RemoteDataSource,
-            localDataSource: LocalDataSource
+            remoteDataSource: IRemoteDataSource,
+            localDataSource: ILocalDataSource
         ): Repository {
             return instance ?: synchronized(this) {
                 instance ?: Repository(remoteDataSource, localDataSource).also {
@@ -110,6 +112,10 @@ class Repository(
 
     suspend fun addAlert(alert: Alert) {
         localDataSource.addAlert(alert)
+    }
+
+    suspend fun updateAlert(alert: Alert) {
+        localDataSource.updateAlert(alert)
     }
 
     suspend fun updateAlertStatus(alertId: String, isActive: Boolean) {

@@ -38,13 +38,22 @@ object AlarmManager {
 
     fun stopAlarm() {
         try {
-            mediaPlayer?.stop()
+            if (mediaPlayer == null) {
+                Log.w("AlarmManager", "MediaPlayer is null, cannot stop alarm")
+                isPlaying = false
+                return
+            }
+            if (mediaPlayer?.isPlaying == true) {
+                mediaPlayer?.stop()
+            }
             mediaPlayer?.release()
             mediaPlayer = null
             isPlaying = false
             Log.d("AlarmManager", "Alarm stopped")
         } catch (e: Exception) {
             Log.e("AlarmManager", "Error stopping alarm: ${e.message}", e)
+            mediaPlayer = null
+            isPlaying = false
         }
     }
 }

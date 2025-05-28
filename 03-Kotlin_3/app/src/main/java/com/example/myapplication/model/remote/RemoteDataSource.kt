@@ -7,10 +7,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.Response
 
-class RemoteDataSource {
+class RemoteDataSource : IRemoteDataSource {
     private val apiService: ApiService = RetrofitClient.service
 
-    suspend fun fetchHourlyForecast(
+    override suspend fun fetchHourlyForecast(
         latitude: Double,
         longitude: Double,
         apiKey: String,
@@ -38,7 +38,7 @@ class RemoteDataSource {
         }
     }
 
-    suspend fun fetchCurrentWeather(
+    override suspend fun fetchCurrentWeather(
         latitude: Double,
         longitude: Double,
         apiKey: String,

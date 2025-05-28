@@ -46,7 +46,7 @@ class DailyForecastAdapter(
                 else -> "°C"
             }
             tempMaxTextView.text = "${forecast.main.tempMax.toInt()}$unitSymbol"
-            tempMinTextView.text = "${forecast.main.tempMax.toInt()}$unitSymbol"
+            tempMinTextView.text = "${forecast.main.tempMin.toInt()}$unitSymbol"
 
             // Load weather icon
             forecast.weather.firstOrNull()?.icon?.let { iconCode ->

@@ -17,11 +17,12 @@ import com.example.myapplication.model.local.AlarmType
 import com.example.myapplication.model.local.Alert
 import com.example.myapplication.model.repo.Repository
 import com.example.myapplication.ui.alert.AlarmBroadcastReceiver
+import com.example.myapplication.ui.alert.work.AlertWorker
 import kotlinx.coroutines.launch
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 import android.content.pm.PackageManager
-import com.example.myapplication.ui.alert.worker.AlertWorker
+import androidx.work.await
 
 class AlertViewModel(private val repository: Repository, private val context: Context) : ViewModel() {
 
@@ -65,17 +66,57 @@ class AlertViewModel(private val repository: Repository, private val context: Co
         }
     }
 
+    fun snoozeAlert(alertId: String) {
+        viewModelScope.launch {
+            try {
+                val alert = repository.getAlerts().find { it.id == alertId }
+                if (alert == null) {
+                    Log.w("AlertViewModel", "Alert $alertId not found for snooze")
+                    return@launch
+                }
+                // Stop the current alarm
+                val stopIntent = Intent(AlarmBroadcastReceiver.ACTION_STOP_ALARM).apply {
+                    setPackage(context.packageName)
+                    putExtra("alertId", alertId)
+                }
+                context.sendBroadcast(stopIntent)
+                Log.d("AlertViewModel", "Stop broadcast sent for snooze of alert $alertId")
+
+                // Reschedule the alert for 5 minutes from now
+                val snoozeDurationMillis = 5 * 60 * 1000L // 5 minutes
+                val newToTimeMillis = System.currentTimeMillis() + snoozeDurationMillis
+                val newAlert = alert.copy(
+                    fromTimeMillis = System.currentTimeMillis(),
+                    toTimeMillis = newToTimeMillis,
+                    durationHours = 0 // Duration is not relevant for snoozed alerts
+                )
+                repository.updateAlert(newAlert)
+                scheduleAlert(newAlert)
+                Log.d("AlertViewModel", "Snoozed alert $alertId for 5 minutes")
+                loadAlerts()
+            } catch (e: Exception) {
+                Log.e("AlertViewModel", "Error snoozing alert $alertId: ${e.message}", e)
+            }
+        }
+    }
+
     fun stopAlert(alertId: String) {
         viewModelScope.launch {
             try {
                 repository.updateAlertStatus(alertId, false)
-                WorkManager.getInstance(context).cancelUniqueWork(alertId)
-                val stopIntent = Intent(AlarmBroadcastReceiver.ACTION_STOP_ALARM)
+                val workInfo = WorkManager.getInstance(context).getWorkInfosForUniqueWork(alertId).get()
+                Log.d("AlertViewModel", "Work state for $alertId: ${workInfo.joinToString { it.state.name }}")
+                WorkManager.getInstance(context).cancelUniqueWork(alertId).await()
+                val stopIntent = Intent(AlarmBroadcastReceiver.ACTION_STOP_ALARM).apply {
+                    setPackage(context.packageName) // Scope the broadcast to this app
+                    putExtra("alertId", alertId) // Optional: Add alert ID for debugging
+                }
+                Log.d("AlertViewModel", "Sending stop broadcast for alert $alertId with action ${stopIntent.action}, package ${context.packageName}")
                 context.sendBroadcast(stopIntent)
-                Log.d("AlertViewModel", "Stopping alert $alertId and sending stop alarm broadcast")
+                Log.d("AlertViewModel", "Stop broadcast sent for alert $alertId")
                 loadAlerts()
             } catch (e: Exception) {
-                Log.e("AlertViewModel", "Error stopping alert $alertId: ${e.message}")
+                Log.e("AlertViewModel", "Error stopping alert $alertId: ${e.message}", e)
             }
         }
     }
@@ -85,7 +126,10 @@ class AlertViewModel(private val repository: Repository, private val context: Co
             try {
                 repository.deleteAlert(alertId)
                 WorkManager.getInstance(context).cancelUniqueWork(alertId)
-                val stopIntent = Intent(AlarmBroadcastReceiver.ACTION_STOP_ALARM)
+                val stopIntent = Intent(AlarmBroadcastReceiver.ACTION_STOP_ALARM).apply {
+                    setPackage(context.packageName) // Scope the broadcast to this app
+                    putExtra("alertId", alertId) // Optional: Add alert ID for debugging
+                }
                 context.sendBroadcast(stopIntent)
                 Log.d("AlertViewModel", "Deleting alert $alertId and sending stop alarm broadcast")
                 loadAlerts()

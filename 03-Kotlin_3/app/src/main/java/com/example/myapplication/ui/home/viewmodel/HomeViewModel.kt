@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.myapplication.model.repo.Repository
 import com.example.weatherapp.model.pojos.CurrentWeatherResponse
 import com.example.weatherapp.model.pojos.WeatherData
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -37,9 +38,9 @@ class HomeViewModel(private val repository: Repository) : ViewModel() {
     val windUnit: LiveData<String> get() = _windUnit
 
     fun setUnits(tempUnit: String, windUnit: String, language: String) {
-        _tempUnit.value = tempUnit
-        _windUnit.value = windUnit
-        _language.value = language
+        if (_tempUnit.value != tempUnit) _tempUnit.value = tempUnit
+        if (_windUnit.value != windUnit) _windUnit.value = windUnit
+        if (_language.value != language) _language.value = language
     }
 
     fun fetchWeatherData(
@@ -50,83 +51,93 @@ class HomeViewModel(private val repository: Repository) : ViewModel() {
         lang: String = "en",
         isNetworkAvailable: Boolean
     ) {
+        if (!isNetworkAvailable) {
+            getCachedWeatherData(latitude, longitude, tempUnit.value ?: "celsius", windUnit.value ?: "m/s")
+            return
+        }
+
         _isLoading.value = true
         _error.value = ""
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
-                if (isNetworkAvailable) {
-                    // Online mode: Fetch from API
-                    val currentWeatherResult = repository.getCurrentWeather(latitude, longitude, apiKey, units, lang)
-                    if (currentWeatherResult.isSuccess) {
-                        currentWeatherResult.getOrNull()?.let { currentWeather ->
-                            _currentWeather.value = currentWeather
+                val currentWeatherResult = repository.getCurrentWeather(latitude, longitude, apiKey, units, lang)
+                if (currentWeatherResult.isSuccess) {
+                    currentWeatherResult.getOrNull()?.let { currentWeather ->
+                        if (_currentWeather.value != currentWeather) {
+                            _currentWeather.postValue(currentWeather)
                             repository.saveCurrentWeatherResponse(currentWeather)
                         }
-                    } else {
-                        _error.value = currentWeatherResult.exceptionOrNull()?.localizedMessage ?: "Unknown error fetching current weather"
-                    }
-
-                    val forecastResult = repository.getHourlyForecast(latitude, longitude, apiKey, units, lang)
-                    if (forecastResult.isSuccess) {
-                        forecastResult.getOrNull()?.let { forecastResponse ->
-                            val hourlyData = forecastResponse.list.take(8)
-                            _hourlyForecast.value = hourlyData
-
-                            val dailyData = processDailyForecast(forecastResponse.list)
-                            _dailyForecast.value = dailyData
-
-                            repository.saveHourlyWeatherResponse(forecastResponse)
-                        } ?: run {
-                            _error.value = "Forecast data is null"
-                        }
-                    } else {
-                        _error.value = forecastResult.exceptionOrNull()?.localizedMessage ?: "Unknown error fetching forecast"
                     }
                 } else {
-                    // Offline mode: Retrieve cached data
-                    getCachedWeatherData(latitude, longitude, tempUnit.value ?: "celsius", windUnit.value ?: "m/s")
+                    _error.postValue(currentWeatherResult.exceptionOrNull()?.localizedMessage ?: "Unknown error fetching current weather")
+                }
+
+                val forecastResult = repository.getHourlyForecast(latitude, longitude, apiKey, units, lang)
+                if (forecastResult.isSuccess) {
+                    forecastResult.getOrNull()?.let { forecastResponse ->
+                        val hourlyData = forecastResponse.list.take(8)
+                        if (_hourlyForecast.value != hourlyData) {
+                            _hourlyForecast.postValue(hourlyData)
+                        }
+
+                        val dailyData = processDailyForecast(forecastResponse.list)
+                        if (_dailyForecast.value != dailyData) {
+                            _dailyForecast.postValue(dailyData)
+                        }
+
+                        repository.saveHourlyWeatherResponse(forecastResponse)
+                    } ?: run {
+                        _error.postValue("Forecast data is null")
+                    }
+                } else {
+                    _error.postValue(forecastResult.exceptionOrNull()?.localizedMessage ?: "Unknown error fetching forecast")
                 }
             } catch (e: Exception) {
-                _error.value = "Failed to fetch weather data: ${e.localizedMessage}"
+                _error.postValue("Failed to fetch weather data: ${e.localizedMessage}")
             } finally {
-                _isLoading.value = false
+                _isLoading.postValue(false)
             }
         }
     }
 
     fun getCachedWeatherData(latitude: Double, longitude: Double, tempUnit: String, windUnit: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
-                // Get the latest weather ID
+                _isLoading.postValue(true)
                 val lastWeatherId = repository.getLastWeatherId()
                 if (lastWeatherId != null) {
-                    // Fetch cached current weather
                     val cachedCurrent = repository.getCurrentWeatherLocal(lastWeatherId)
                     if (cachedCurrent != null) {
-                        _currentWeather.value = convertCurrentWeather(cachedCurrent, tempUnit, windUnit)
+                        val convertedCurrent = convertCurrentWeather(cachedCurrent, tempUnit, windUnit)
+                        if (_currentWeather.value != convertedCurrent) {
+                            _currentWeather.postValue(convertedCurrent)
+                        }
                     } else {
-                        _error.value = "No cached current weather data available"
+                        _error.postValue("No cached current weather data available for ID: $lastWeatherId")
                     }
 
-                    // Fetch cached hourly forecast
                     val cachedForecast = repository.getHourlyForecastLocal(lastWeatherId)
                     if (cachedForecast != null) {
                         val hourlyData = cachedForecast.list.take(8).map { convertWeatherData(it, tempUnit) }
-                        _hourlyForecast.value = hourlyData
+                        if (_hourlyForecast.value != hourlyData) {
+                            _hourlyForecast.postValue(hourlyData)
+                        }
 
                         val dailyData = processDailyForecast(cachedForecast.list).map { convertWeatherData(it, tempUnit) }
-                        _dailyForecast.value = dailyData
+                        if (_dailyForecast.value != dailyData) {
+                            _dailyForecast.postValue(dailyData)
+                        }
                     } else {
-                        _error.value = "No cached forecast data available"
+                        _error.postValue("No cached forecast data available for ID: $lastWeatherId")
                     }
                 } else {
-                    _error.value = "No cached weather data available"
+                    _error.postValue("No cached weather data available")
                 }
             } catch (e: Exception) {
-                _error.value = "Failed to retrieve cached weather data: ${e.localizedMessage}"
+                _error.postValue("Failed to retrieve cached weather data: ${e.localizedMessage}")
             } finally {
-                _isLoading.value = false
+                _isLoading.postValue(false)
             }
         }
     }
@@ -143,16 +154,25 @@ class HomeViewModel(private val repository: Repository) : ViewModel() {
         return forecastList
             .filter { it.dt >= tomorrow }
             .groupBy { it.dtTxt.substring(0, 10) }
-            .mapNotNull { (_, dailyForecasts) ->
-                dailyForecasts.minByOrNull { forecast ->
+            .mapNotNull { (date, dailyForecasts) ->
+                // Select the forecast closest to noon for display
+                val representativeForecast = dailyForecasts.minByOrNull { forecast ->
                     val time = forecast.dtTxt.substring(11, 16)
                     val hours = time.substring(0, 2).toInt()
                     kotlin.math.abs(hours - 12)
-                }
-            }
-            .map {
-                // Set min and max temperatures to be the same
-                it.copy(main = it.main.copy(tempMin = it.main.tempMax, tempMax = it.main.tempMax))
+                } ?: return@mapNotNull null
+
+                // Calculate actual max and min temperatures for the day
+                val temps = dailyForecasts.map { it.main.temp }
+                val tempMax = temps.maxOrNull() ?: representativeForecast.main.temp
+                val tempMin = temps.minOrNull() ?: representativeForecast.main.temp
+
+                representativeForecast.copy(
+                    main = representativeForecast.main.copy(
+                        tempMax = tempMax,
+                        tempMin = tempMin
+                    )
+                )
             }
             .take(4)
     }
@@ -195,7 +215,12 @@ class HomeViewModel(private val repository: Repository) : ViewModel() {
             "kelvin" -> data.main.tempMax + 273.15f
             else -> data.main.tempMax
         }
-        return data.copy(main = data.main.copy(temp = temp, tempMax = tempMax, tempMin = tempMax))
+        val tempMin = when (tempUnit) {
+            "fahrenheit" -> (data.main.tempMin * 9 / 5) + 32
+            "kelvin" -> data.main.tempMin + 273.15f
+            else -> data.main.tempMin
+        }
+        return data.copy(main = data.main.copy(temp = temp, tempMax = tempMax, tempMin = tempMin))
     }
 
     fun clearError() {

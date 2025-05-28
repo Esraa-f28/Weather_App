@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">تطبيقي</string>
+    <string name="navigation_drawer_open">فتح درج التنقل</string>
+    <string name="navigation_drawer_close">إغلاق درج التنقل</string>
+    <string name="nav_header_title">أندرويد ستوديو</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">رأس التنقل</string>
+    <string name="action_settings">الإعدادات</string>
+    <string name="menu_home">الرئيسية</string>
+    <string name="menu_settings">الإعدادات</string>
+    <string name="menu_slideshow">عرض الشرائح</string>
+    <string name="menu_alert">التنبيهات</string>
+    <string name="menu_fav">المفضلة</string>
+    <string name="first_fragment_label">الجزء الأول</string>
+    <string name="second_fragment_label">الجزء الثاني</string>
+    <string name="next">التالي</string>
+    <string name="previous">السابق</string>
+
+
+    <string name="settings_title">الإعدادات</string>
+    <string name="location_section_title">الموقع</string>
+    <string name="gps_location">موقع GPS</string>
+    <string name="map_location">الموقع على الخريطة</string>
+    <string name="temp_unit_section_title">وحدة درجة الحرارة</string>
+    <string name="celsius">سيلزيوس</string>
+    <string name="fahrenheit">فهرنهايت</string>
+    <string name="kelvin">كلفن</string>
+    <string name="wind_unit_section_title">وحدة الرياح</string>
+    <string name="meter_per_second">متر في الثانية (م/ث)</string>
+    <string name="miles_per_hour">ميل في الساعة (ميل/س)</string>
+    <string name="language_section_title">اللغة</string>
+    <string name="english">الإنجليزية</string>
+    <string name="arabic">العربية</string>
+    <string name="notifications_section_title">الإشعارات</string>
+    <string name="enable_notifications">تفعيل الإشعارات</string>
+    <string name="disable_notifications">تعطيل الإشعارات</string>
+
+    <string name="pressure_label">الضغط</string>
+    <string name="humidity_label">الرطوبة</string>
+    <string name="wind_label">الرياح</string>
+    <string name="cloud_label">السحب</string>
+    <string name="hourly_forecast_label">اليوم</string>
+    <string name="daily_forecast_label">توقعات لأربعة أيام</string>
+    <string name="weather_icon_desc">أيقونة الطقس</string>
+
+        <string name="time_range_connector">إلى</string>
+        <string name="stop_button">توقف</string>
+        <string name="delete_button">حذف</string>
+    <string name="snooze_button">غفوة</string>
+    <string name="device_language">استخدام لغة الجهاز</string>
+</resources>

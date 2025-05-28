@@ -50,16 +50,6 @@ class AlertFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d("AlertFragment", "onCreate called")
-        try {
-            val filter = IntentFilter().apply {
-                addAction(AlarmBroadcastReceiver.ACTION_START_ALARM)
-                addAction(AlarmBroadcastReceiver.ACTION_STOP_ALARM)
-            }
-            requireContext().registerReceiver(alarmReceiver, filter)
-            Log.d("AlertFragment", "Registered AlarmBroadcastReceiver in onCreate")
-        } catch (e: Exception) {
-            Log.e("AlertFragment", "Error in onCreate: ${e.message}", e)
-        }
     }
 
     override fun onCreateView(
@@ -81,6 +71,27 @@ class AlertFragment : Fragment() {
         } catch (e: Exception) {
             Log.e("AlertFragment", "Error in onCreateView: ${e.message}", e)
             throw e
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Log.d("AlertFragment", "onStart called")
+        try {
+            val filter = IntentFilter().apply {
+                addAction(AlarmBroadcastReceiver.ACTION_START_ALARM)
+                addAction(AlarmBroadcastReceiver.ACTION_STOP_ALARM)
+            }
+            // Use ContextCompat.registerReceiver with RECEIVER_NOT_EXPORTED for Android 14+
+            ContextCompat.registerReceiver(
+                requireContext(),
+                alarmReceiver,
+                filter,
+                ContextCompat.RECEIVER_NOT_EXPORTED
+            )
+            Log.d("AlertFragment", "Registered AlarmBroadcastReceiver in onStart")
+        } catch (e: Exception) {
+            Log.e("AlertFragment", "Error registering receiver in onStart: ${e.message}", e)
         }
     }
 
@@ -146,25 +157,20 @@ class AlertFragment : Fragment() {
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        Log.d("AlertFragment", "onStart called")
-    }
-
     override fun onStop() {
         super.onStop()
         Log.d("AlertFragment", "onStop called")
+        try {
+            requireContext().unregisterReceiver(alarmReceiver)
+            Log.d("AlertFragment", "Unregistered AlarmBroadcastReceiver in onStop")
+        } catch (e: Exception) {
+            Log.e("AlertFragment", "Error unregistering receiver in onStop: ${e.message}", e)
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         Log.d("AlertFragment", "onDestroy called")
-        try {
-            requireContext().unregisterReceiver(alarmReceiver)
-            Log.d("AlertFragment", "Unregistered AlarmBroadcastReceiver in onDestroy")
-        } catch (e: Exception) {
-            Log.e("AlertFragment", "Error unregistering receiver: ${e.message}", e)
-        }
     }
 
     override fun onDestroyView() {
@@ -179,6 +185,18 @@ class AlertFragment : Fragment() {
             binding.alertRecyclerView.layoutManager = LinearLayoutManager(requireContext())
             Log.d("AlertFragment", "Setting up RecyclerView")
             binding.alertRecyclerView.adapter = AlertAdapter(
+                onSnoozeClick = { alertId ->
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        try {
+                            viewModel.snoozeAlert(alertId)
+                            Log.d("AlertFragment", "Snoozed alert: $alertId")
+                            Toast.makeText(context, "Alert snoozed for 5 minutes", Toast.LENGTH_SHORT).show()
+                        } catch (e: Exception) {
+                            Log.e("AlertFragment", "Error snoozing alert: ${e.message}", e)
+                            Toast.makeText(context, "Failed to snooze alert", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                },
                 onStopClick = { alertId ->
                     viewLifecycleOwner.lifecycleScope.launch {
                         try {

@@ -4,8 +4,7 @@ import android.content.Context
 import com.example.weatherapp.model.pojos.CurrentWeatherResponse
 import com.example.weatherapp.model.pojos.WeatherResponse
 
-class LocalDataSource private constructor(context: Context) {
-
+class LocalDataSource private constructor(context: Context) : ILocalDataSource {
     private val weatherDao: WeatherDao
 
     companion object {
@@ -26,51 +25,54 @@ class LocalDataSource private constructor(context: Context) {
         weatherDao = database.weatherDao()
     }
 
-    suspend fun saveCurrentWeatherResponse(weatherResponse: CurrentWeatherResponse) {
+    override suspend fun saveCurrentWeatherResponse(weatherResponse: CurrentWeatherResponse) {
         weatherDao.insertCurrentWeatherResponse(weatherResponse)
     }
 
-    suspend fun saveHourlyWeatherResponse(weatherResponse: WeatherResponse) {
+    override suspend fun saveHourlyWeatherResponse(weatherResponse: WeatherResponse) {
         weatherDao.insertHourlyWeatherResponse(weatherResponse)
     }
 
-    suspend fun getCachedCurrentWeatherResponse(id: Long): CurrentWeatherResponse? {
+    override suspend fun getCachedCurrentWeatherResponse(id: Long): CurrentWeatherResponse? {
         return weatherDao.getCurrentWeatherResponseById(id)
     }
 
-    suspend fun getCachedHourlyWeatherResponse(id: Long): WeatherResponse? {
+    override suspend fun getCachedHourlyWeatherResponse(id: Long): WeatherResponse? {
         return weatherDao.getHourlyWeatherResponseById(id)
     }
 
-    suspend fun getLastWeatherId(): Long? {
+    override suspend fun getLastWeatherId(): Long? {
         return weatherDao.getLastWeatherId()
     }
 
-    suspend fun getFavoritePlaces(): List<FavoritePlace> {
+    override suspend fun getFavoritePlaces(): List<FavoritePlace> {
         return weatherDao.getFavoritePlaces()
     }
 
-    suspend fun addFavoritePlace(place: FavoritePlace) {
+    override suspend fun addFavoritePlace(place: FavoritePlace) {
         weatherDao.insertFavoritePlace(place)
     }
 
-    suspend fun deleteFavoritePlace(place: FavoritePlace) {
+    override suspend fun deleteFavoritePlace(place: FavoritePlace) {
         weatherDao.deleteFavoritePlace(place)
     }
 
-    suspend fun getAlerts(): List<Alert> {
+    override suspend fun getAlerts(): List<Alert> {
         return weatherDao.getAlerts()
     }
 
-    suspend fun addAlert(alert: Alert) {
+    override suspend fun addAlert(alert: Alert) {
         weatherDao.addAlert(alert)
     }
+    override suspend fun updateAlert(alert: Alert) {
+        weatherDao.updateAlert(alert)
+    }
 
-    suspend fun updateAlertStatus(alertId: String, isActive: Boolean) {
+    override suspend fun updateAlertStatus(alertId: String, isActive: Boolean) {
         weatherDao.updateAlertStatus(alertId, isActive)
     }
 
-    suspend fun deleteAlert(alertId: String) {
+    override suspend fun deleteAlert(alertId: String) {
         weatherDao.deleteAlert(alertId)
     }
 }

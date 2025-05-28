@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:background="#1C2526">
+    android:background="@drawable/gradient_background">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -20,9 +20,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            app:cardBackgroundColor="#2A2F30"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="6dp"
+            app:cardBackgroundColor="@android:color/transparent"
+            app:cardCornerRadius="0dp"
+            app:cardElevation="0dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
@@ -31,6 +31,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
+                android:background="@drawable/background2"
                 android:padding="16dp">
 
                 <com.google.android.material.button.MaterialButton
@@ -38,12 +39,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
-                    android:text="Location"
+                    android:text="@string/location_section_title"
                     android:textColor="#FFFFFF"
                     android:textSize="18sp"
                     android:textStyle="bold"
-                    android:background="#7E57C2"
-                    app:cornerRadius="12dp" /> <!-- Changed from 80dp to 12dp -->
+                    android:background="@drawable/background2"
+                    app:cornerRadius="60dp" /> <!-- Changed from 80dp to 12dp -->
 
                 <RadioGroup
                     android:id="@+id/locationRadioGroup"
@@ -56,7 +57,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:buttonTint="#FF00FF"
-                        android:text="GPS"
+                        android:text="@string/gps_location"
                         android:textColor="#FFFFFF"
                         android:textSize="16sp" />
 
@@ -66,7 +67,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:buttonTint="#FF00FF"
-                        android:text="Map"
+                        android:text="@string/map_location"
                         android:textColor="#FFFFFF"
                         android:textSize="16sp" />
                 </RadioGroup>
@@ -79,9 +80,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="6dp"
-            app:cardBackgroundColor="#2A2F30"
+            app:cardBackgroundColor="@android:color/transparent"
+            app:cardCornerRadius="0dp"
+            app:cardElevation="0dp"
             app:layout_constraintTop_toBottomOf="@id/location_card"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
@@ -90,18 +91,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
+                android:background="@drawable/background2"
                 android:padding="16dp">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/temp_button"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Temperature Unit"
+                    android:text="@string/temp_unit_section_title"
                     android:textColor="#FFFFFF"
                     android:textSize="18sp"
                     android:textStyle="bold"
-                    app:cornerRadius="12dp"
-                    android:background="#7E57C2"
+                    app:cornerRadius="0dp"
+                    android:background="@drawable/background2"
                     android:layout_marginBottom="8dp" />
 
                 <RadioGroup
@@ -114,7 +116,7 @@
                         android:id="@+id/rbKelvin"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Kelvin"
+                        android:text="@string/kelvin"
                         android:textColor="#FFFFFF"
                         android:textSize="16sp"
                         android:buttonTint="#FF00FF" />
@@ -123,7 +125,7 @@
                         android:id="@+id/rbCelsius"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Celsius"
+                        android:text="@string/celsius"
                         android:textColor="#FFFFFF"
                         android:textSize="16sp"
                         android:buttonTint="#FF00FF"
@@ -133,7 +135,7 @@
                         android:id="@+id/rbFahrenheit"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Fahrenheit"
+                        android:text="@string/fahrenheit"
                         android:textColor="#FFFFFF"
                         android:textSize="16sp"
                         android:buttonTint="#FF00FF"
@@ -148,9 +150,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="6dp"
-            app:cardBackgroundColor="#2A2F30"
+            app:cardBackgroundColor="@android:color/transparent"
+            app:cardCornerRadius="0dp"
+            app:cardElevation="0dp"
             app:layout_constraintTop_toBottomOf="@id/temp_card"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
@@ -159,18 +161,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
+                android:background="@drawable/background2"
                 android:padding="16dp">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/wind_button"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Wind Unit"
+                    android:text="@string/wind_unit_section_title"
                     android:textColor="#FFFFFF"
                     android:textSize="18sp"
                     android:textStyle="bold"
-                    app:cornerRadius="12dp"
-                    android:background="#7E57C2"
+                    app:cornerRadius="0dp"
+                    android:background="@drawable/background2"
                     android:layout_marginBottom="8dp" />
 
                 <RadioGroup
@@ -183,7 +186,7 @@
                         android:id="@+id/rbMeterSec"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="m/s"
+                        android:text="@string/meter_per_second"
                         android:textColor="#FFFFFF"
                         android:textSize="16sp"
                         android:buttonTint="#FF00FF" />
@@ -192,7 +195,7 @@
                         android:id="@+id/rbMilesHour"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="mph"
+                        android:text="@string/miles_per_hour"
                         android:textColor="#FFFFFF"
                         android:textSize="16sp"
                         android:buttonTint="#FF00FF"
@@ -207,9 +210,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="6dp"
-            app:cardBackgroundColor="#2A2F30"
+            app:cardBackgroundColor="@android:color/transparent"
+            app:cardCornerRadius="0dp"
+            app:cardElevation="0dp"
             app:layout_constraintTop_toBottomOf="@id/wind_card"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
@@ -218,18 +221,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
+                android:background="@drawable/background2"
                 android:padding="16dp">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/language_button"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Language"
+                    android:text="@string/language_section_title"
                     android:textColor="#FFFFFF"
                     android:textSize="18sp"
                     android:textStyle="bold"
-                    app:cornerRadius="12dp"
-                    android:background="#7E57C2"
+                    app:cornerRadius="0dp"
+                    android:background="@drawable/background2"
                     android:layout_marginBottom="8dp" />
 
                 <RadioGroup
@@ -242,7 +246,7 @@
                         android:id="@+id/rbArabic"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Arabic"
+                        android:text="@string/arabic"
                         android:textColor="#FFFFFF"
                         android:textSize="16sp"
                         android:buttonTint="#FF00FF" />
@@ -251,7 +255,16 @@
                         android:id="@+id/rbEnglish"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="English"
+                        android:text="@string/english"
+                        android:textColor="#FFFFFF"
+                        android:textSize="16sp"
+                        android:buttonTint="#FF00FF"
+                        android:layout_marginStart="16dp" />
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:id="@+id/rbDeviceLanguage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/device_language"
                         android:textColor="#FFFFFF"
                         android:textSize="16sp"
                         android:buttonTint="#FF00FF"
@@ -267,9 +280,9 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="16dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="6dp"
-            app:cardBackgroundColor="#2A2F30"
+            app:cardBackgroundColor="@android:color/transparent"
+            app:cardCornerRadius="0dp"
+            app:cardElevation="0dp"
             app:layout_constraintTop_toBottomOf="@id/language_card"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
@@ -278,18 +291,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
+                android:background="@drawable/background2"
                 android:padding="16dp">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/notifications_button"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Notifications"
+                    android:text="@string/notifications_section_title"
                     android:textColor="#FFFFFF"
                     android:textSize="18sp"
                     android:textStyle="bold"
-                    app:cornerRadius="12dp"
-                    android:background="#7E57C2"
+                    app:cornerRadius="0dp"
+                    android:background="@drawable/background2"
                     android:layout_marginBottom="8dp" />
 
                 <RadioGroup
@@ -302,7 +316,7 @@
                         android:id="@+id/rbEnableNotifications"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Enable"
+                        android:text="@string/enable_notifications"
                         android:textColor="#FFFFFF"
                         android:textSize="16sp"
                         android:buttonTint="#FF00FF" />
@@ -311,18 +325,12 @@
                         android:id="@+id/rbDisableNotifications"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Disable"
+                        android:text="@string/disable_notifications"
                         android:textColor="#FFFFFF"
                         android:textSize="16sp"
                         android:buttonTint="#FF00FF"
                         android:layout_marginStart="16dp" />
                 </RadioGroup>
-                <Button
-                    android:id="@+id/btnSaveSettings"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Save Settings"
-                    android:layout_marginTop="24dp" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
         <!-- Save Button -->

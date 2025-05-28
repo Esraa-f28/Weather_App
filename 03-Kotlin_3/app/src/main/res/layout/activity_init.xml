@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
-    android:background="@color/background">
+    android:background="@drawable/gradient_background">
 
     <!-- Enlarged and centered CardView -->
     <androidx.cardview.widget.CardView
@@ -14,13 +14,14 @@
         android:layout_height="200dp"
         card_view:cardCornerRadius="16dp"
         card_view:cardElevation="8dp"
-        card_view:cardBackgroundColor="@color/cardbackground"
+        card_view:cardBackgroundColor="@android:color/transparent"
         android:padding="24dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
+            android:background="@drawable/background2"
             android:gravity="center">
 
             <Button

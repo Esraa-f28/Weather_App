@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.myapplication.databinding.ActivityInitBinding
 import com.example.myapplication.utils.LocationProvider
 import com.example.myapplication.utils.OsmMapActivity
+import java.util.*
 
 class InitActivity : AppCompatActivity() {
 
@@ -58,41 +59,25 @@ class InitActivity : AppCompatActivity() {
             result.data?.let { data ->
                 val lat = data.getDoubleExtra("lat", Double.NaN)
                 val lon = data.getDoubleExtra("lon", Double.NaN)
-
-                // Validate coordinates
                 if (lat.isNaN() || lon.isNaN() || lat == 0.0 || lon == 0.0 ||
                     lat < -90.0 || lat > 90.0 || lon < -180.0 || lon > 180.0) {
                     Log.e(TAG, "Invalid map coordinates received: lat=$lat, lon=$lon")
                     Toast.makeText(this, "Invalid location selected. Please try again.", Toast.LENGTH_LONG).show()
                     return@let
                 }
-
-                // Coordinates are already saved in OsmMapActivity, verify SharedPreferences
-                val savedLat = sharedPreferences.getFloat(PREF_LATITUDE, Float.NaN).toDouble()
-                val savedLon = sharedPreferences.getFloat(PREF_LONGITUDE, Float.NaN).toDouble()
-                if (savedLat == lat && savedLon == lon) {
-                    Log.d(TAG, "Map coordinates match SharedPreferences: lat=$lat, lon=$lon")
-                } else {
-                    Log.w(TAG, "Mismatch between Intent and SharedPreferences: Intent(lat=$lat, lon=$lon), SharedPrefs(lat=$savedLat, lon=$savedLon)")
-                    // Update SharedPreferences to ensure consistency
-                    sharedPreferences.edit()
-                        .putFloat(PREF_LATITUDE, lat.toFloat())
-                        .putFloat(PREF_LONGITUDE, lon.toFloat())
-                        .apply()
-                }
-
-                // Save settings to SharedPreferences
+                sharedPreferences.edit()
+                    .putFloat(PREF_LATITUDE, lat.toFloat())
+                    .putFloat(PREF_LONGITUDE, lon.toFloat())
+                    .apply()
+                Log.d(TAG, "Map coordinates match SharedPreferences: lat=$lat, lon=$lon")
                 sharedPreferences.edit()
                     .putString(PREF_LOCATION_TYPE, "map")
                     .putString(PREF_TEMP_UNIT, sharedPreferences.getString(PREF_TEMP_UNIT, "celsius") ?: "celsius")
                     .putString(PREF_WIND_UNIT, sharedPreferences.getString(PREF_WIND_UNIT, "m/s") ?: "m/s")
-                    .putString(PREF_LANGUAGE, sharedPreferences.getString(PREF_LANGUAGE, "english") ?: "english")
+                    .putString(PREF_LANGUAGE, getDeviceLanguage())
                     .putBoolean(PREF_NOTIFICATIONS, sharedPreferences.getBoolean(PREF_NOTIFICATIONS, true))
                     .apply()
-
                 Log.d(TAG, "Map location selected: Latitude=$lat, Longitude=$lon")
-
-                // Create a mock Location object for map selection
                 val location = Location("map").apply {
                     latitude = lat
                     longitude = lon
@@ -164,7 +149,6 @@ class InitActivity : AppCompatActivity() {
         locationProvider.getLocation(
             onSuccess = { location ->
                 Log.d(TAG, "GPS location retrieved: Latitude=${location.latitude}, Longitude=${location.longitude}")
-                // Save coordinates to SharedPreferences
                 sharedPreferences.edit()
                     .putFloat(PREF_LATITUDE, location.latitude.toFloat())
                     .putFloat(PREF_LONGITUDE, location.longitude.toFloat())
@@ -195,16 +179,23 @@ class InitActivity : AppCompatActivity() {
             .show()
     }
 
+    private fun getDeviceLanguage(): String {
+        val deviceLocale = Locale.getDefault().language
+        return when (deviceLocale) {
+            "ar" -> "arabic"
+            else -> "english"
+        }
+    }
+
     private fun saveLocationTypeAndNavigate(locationType: String, location: Location? = null) {
         Log.d(TAG, "Saving location type: $locationType")
         sharedPreferences.edit()
             .putString(PREF_LOCATION_TYPE, locationType)
             .putString(PREF_TEMP_UNIT, sharedPreferences.getString(PREF_TEMP_UNIT, "celsius") ?: "celsius")
             .putString(PREF_WIND_UNIT, sharedPreferences.getString(PREF_WIND_UNIT, "m/s") ?: "m/s")
-            .putString(PREF_LANGUAGE, sharedPreferences.getString(PREF_LANGUAGE, "english") ?: "english")
+            .putString(PREF_LANGUAGE, getDeviceLanguage())
             .putBoolean(PREF_NOTIFICATIONS, sharedPreferences.getBoolean(PREF_NOTIFICATIONS, true))
             .apply()
-
         navigateToMainActivity(location)
     }
 

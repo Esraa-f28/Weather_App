@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.example.weatherapp.model.pojos.CurrentWeatherResponse
 import com.example.weatherapp.model.pojos.WeatherResponse
 
@@ -35,7 +36,8 @@ interface WeatherDao {
 
     @Query("SELECT * FROM alert")
     suspend fun getAlerts(): List<Alert>
-
+    @Update
+    suspend fun updateAlert(alert: Alert)
     @Insert
     suspend fun addAlert(alert: Alert)
 

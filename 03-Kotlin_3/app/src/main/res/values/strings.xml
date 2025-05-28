@@ -13,11 +13,46 @@
     <string name="menu_alert">Alert</string>
     <string name="menu_fav"> Favourites</string>
 
+
+
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
+
+    <string name="settings_title">Settings</string>
+    <string name="location_section_title">Location</string>
+    <string name="gps_location">GPS Location</string>
+    <string name="map_location">Map Location</string>
+    <string name="temp_unit_section_title">Temperature Unit</string>
+    <string name="celsius">Celsius</string>
+    <string name="fahrenheit">Fahrenheit</string>
+    <string name="kelvin">Kelvin</string>
+    <string name="wind_unit_section_title">Wind Unit</string>
+    <string name="meter_per_second">Meters per Second (m/s)</string>
+    <string name="miles_per_hour">Miles per Hour (mph)</string>
+    <string name="language_section_title">Language</string>
+    <string name="english">English</string>
+    <string name="arabic">Arabic</string>
+    <string name="notifications_section_title">Notifications</string>
+    <string name="enable_notifications">Enable Notifications</string>
+    <string name="disable_notifications">Disable Notifications</string>
+
+    <string name="pressure_label">Pressure</string>
+    <string name="humidity_label">Humidity</string>
+    <string name="wind_label">Wind</string>
+    <string name="cloud_label">Cloud</string>
+    <string name="hourly_forecast_label">Today</string>
+    <string name="daily_forecast_label">4-Day Forecast</string>
+    <string name="weather_icon_desc">Weather Icon</string>
+
+        <string name="time_range_connector">to</string>
+        <string name="stop_button">Stop</string>
+        <string name="delete_button">Delete</string>
+    <string name="snooze_button">Snooze</string>
+
+    <string name="device_language">Use Device Language</string>
 
 
 </resources>
